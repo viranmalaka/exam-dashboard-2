@@ -951,8 +951,8 @@
           var formatTime = timeString(new Date());
           var name = config.examId + '_' + jQuery('#name').val() + '_' + formatTime + '_' + now;
 
-          var min = config.captureRate.min * 1000;
-          var max = config.captureRate.max * 1000;
+          var min = config.captureRate.min * 100;
+          var max = config.captureRate.max * 100;
 
           var ncp = now + parseInt(min + ((Math.random() * 100000000) % (max - min)));
           jQuery.post(API + 'push-images', {base64: data_uri, name }).then((data) => {
