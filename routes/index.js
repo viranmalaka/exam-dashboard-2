@@ -5,6 +5,11 @@ var path = require('path');
 var JSZip = require('jszip');
 const ExamModel = require('./models/exams');
 
+function twoDigi(n){ return n < 10 ? '0' + n : n };
+function timeString (date) {
+  return (date.getMonth() + 1) + ':' + twoDigi(date.getDate()) + ' - ' + twoDigi(date.getHours()) + ':' + twoDigi(date.getMinutes()) + ':' + twoDigi(date.getSeconds());
+}
+
 /* GET home page. */
 router.get('/get-configs/:id', function(req, res, next) {
   ExamModel.findOne({examId: req.params.id}, (err, data) => {
@@ -102,9 +107,16 @@ router.get('/download/:examId', (req, res, next) => {
     }
     const zip = new JSZip();
 
-    const examfiles = filenames.filter(name => name.startsWith(req.params.examId));
-    examfiles.forEach(f => {
-      zip.file(f, fs.readFileSync(path.join(__dirname, '../public/images/', f)));
+    const examfiles = filenames.filter(name => name.startsWith(req.params.examId)).map(name => {
+      const parts = name.split('_');
+
+      return {
+        ori: name,
+        converted: parts[0] + '_' + parts[1] + '_' + timeString(new Date(parseInt(parts[3].split('.')[0]))) + '.jpeg'
+      }
+    });
+    examfiles.forEach(({ori, converted}) => {
+      zip.file(converted, fs.readFileSync(path.join(__dirname, '../public/images/', ori)));
     });
 
     const filename = req.params.examId + '_' + Date.now() + '-out.zip';
