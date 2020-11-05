@@ -110,9 +110,11 @@ router.get('/download/:examId', (req, res, next) => {
     const examfiles = filenames.filter(name => name.startsWith(req.params.examId)).map(name => {
       const parts = name.split('_');
 
+      const x = new Date(parseInt(parts[3].split('.')[0]) + 19800000)
+
       return {
         ori: name,
-        converted: parts[0] + '_' + parts[1] + '_' + timeString(new Date(parseInt(parts[3].split('.')[0]))) + '.jpeg'
+        converted: parts[0] + '_' + parts[1] + '_' + timeString(x) + '.jpeg',
       }
     });
     examfiles.forEach(({ori, converted}) => {
@@ -132,6 +134,27 @@ router.get('/download/:examId', (req, res, next) => {
           });
         }, 300000);
       });
+  });
+});
+
+router.get('/delete-images', (req, res, next) => {
+
+  const directory = path.join(__dirname, '../public/images');
+
+  fs.readdir(directory, (err, files) => {
+    if (err) return req.status(500).jsonp({success: false});
+
+    const errors = [];
+    for (const file of files) {
+      fs.unlink(path.join(directory, file), err => {
+        if (err) errors.push(err);
+      });
+    }
+    if(errors.length > 0) {
+      return req.status(500).jsonp({success: false})
+    } else {
+      return req.status(200).jsonp({success: true});
+    }
   });
 });
 
