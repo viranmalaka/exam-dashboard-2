@@ -142,7 +142,7 @@ router.get('/delete-images', (req, res, next) => {
   const directory = path.join(__dirname, '../public/images');
 
   fs.readdir(directory, (err, files) => {
-    if (err) return req.status(500).jsonp({success: false});
+    if (err) return res.status(500).jsonp({success: false});
 
     const errors = [];
     for (const file of files) {
@@ -151,9 +151,9 @@ router.get('/delete-images', (req, res, next) => {
       });
     }
     if(errors.length > 0) {
-      return req.status(500).jsonp({success: false})
+      return res.status(500).jsonp({success: false})
     } else {
-      return req.status(200).jsonp({success: true});
+      return res.status(200).jsonp({success: true});
     }
   });
 });
